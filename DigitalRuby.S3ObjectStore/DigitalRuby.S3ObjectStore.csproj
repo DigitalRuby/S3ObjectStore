@@ -1,0 +1,40 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Authors>jjxtra</Authors>
+		<Company>Digital Ruby, LLC</Company>
+		<Description>Flexible json s3 object storage for C#</Description>
+		<Copyright>(c) 2022-Present, Digital Ruby, LLC</Copyright>
+		<IsPackable>true</IsPackable>
+		<PackageProjectUrl>https://github.com/DigitalRuby/S3ObjectStore</PackageProjectUrl>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/DigitalRuby/S3ObjectStore</RepositoryUrl>
+		<PackageTags>s3; objects; json; db; database; storage; fast; flexible; no-sql; no; sql; nosql; mongodb; cloud; azure; aws; amazon; google; gcp; file; flat; schema</PackageTags>
+		<PackageReleaseNotes>Initial version</PackageReleaseNotes>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="AWSSDK.S3" Version="3.7.9.19" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+	</ItemGroup>
+
+</Project>
