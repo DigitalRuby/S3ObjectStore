@@ -73,7 +73,7 @@ public interface IStorageObjectService<T> where T : class, IStorageObject
     /// <param name="key">Key</param>
     /// <param name="owner">Owner identifier</param>
     /// <returns>Object or null if not found</returns>
-    Task<T?> GetObjectAsync(string key, string owner);
+    Task<T?> GetObjectAsync(string? key, string owner);
 
     /// <summary>
     /// Set an object. The key and owner properties are used to determine the folder path
@@ -102,5 +102,5 @@ public interface IStorageObjectService<T> where T : class, IStorageObject
     /// <param name="key">Key</param>
     /// <param name="owner">Owner identifier</param>
     /// <returns>Task</returns>
-    Task DeleteObjectAsync(string key, string owner);
+    Task DeleteObjectAsync(string? key, string owner);
 }

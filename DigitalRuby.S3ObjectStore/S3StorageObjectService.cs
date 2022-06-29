@@ -29,7 +29,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetObjectAsync(string key, string owner)
+    public async Task<T?> GetObjectAsync(string? key, string owner)
     {
         var path = options.FormatFilePath(key, owner);
         using var result = await repository.ReadAsync(options.Bucket, path);
@@ -84,7 +84,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public Task DeleteObjectAsync(string key, string owner)
+    public Task DeleteObjectAsync(string? key, string owner)
     {
         var path = options.FormatFilePath(key, owner);
         return repository.DeleteAsync(options.Bucket, path);

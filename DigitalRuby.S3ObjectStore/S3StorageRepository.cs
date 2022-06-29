@@ -199,7 +199,7 @@ public class S3StorageRepository : IStorageRepository
 			Key = fileName,
 			ContentType = contentType,
 			InputStream = data,
-            CalculateContentMD5Header = disableSigning ? false : true,
+            CalculateContentMD5Header = !disableSigning,
 			DisableMD5Stream = disableSigning,
 			DisablePayloadSigning = disableSigning
 		};
@@ -272,11 +272,11 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucketName, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
+	public async Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
 	{
 		ListObjectsV2Request request = new()
 		{
-			BucketName = bucketName,
+			BucketName = bucket,
 			Prefix = prefix,
 			ContinuationToken = continuationToken,
 			MaxKeys = maxKeys

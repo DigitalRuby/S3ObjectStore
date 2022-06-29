@@ -5,7 +5,7 @@ VisualStudioVersion = 17.2.32602.215
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalRuby.S3ObjectStore", "DigitalRuby.S3ObjectStore\DigitalRuby.S3ObjectStore.csproj", "{847E6C8C-0A87-45CE-A188-7E3613350558}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sandbox", "Sandbox\Sandbox.csproj", "{42E832D6-E634-4807-A61B-395305315033}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sandbox", "Sandbox\Sandbox.csproj", "{42E832D6-E634-4807-A61B-395305315033}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionItems", "{54F1764E-946D-4B63-8E72-1B8F9DA13DD5}"
 	ProjectSection(SolutionItems) = preProject
@@ -14,6 +14,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SolutionItems", "SolutionIt
 		LICENSE = LICENSE
 		README.md = README.md
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DigitalRuby.S3ObjectStore.Tests", "DigitalRuby.S3ObjectStore.Tests\DigitalRuby.S3ObjectStore.Tests.csproj", "{B1348EA7-FD8B-4BA4-8883-689DE6D36C9C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,6 +31,10 @@ Global
 		{42E832D6-E634-4807-A61B-395305315033}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{42E832D6-E634-4807-A61B-395305315033}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{42E832D6-E634-4807-A61B-395305315033}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B1348EA7-FD8B-4BA4-8883-689DE6D36C9C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B1348EA7-FD8B-4BA4-8883-689DE6D36C9C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B1348EA7-FD8B-4BA4-8883-689DE6D36C9C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B1348EA7-FD8B-4BA4-8883-689DE6D36C9C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

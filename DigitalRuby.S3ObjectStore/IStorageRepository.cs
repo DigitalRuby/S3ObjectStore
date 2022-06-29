@@ -222,13 +222,13 @@ public interface IStorageRepository
     /// <summary>
     /// List bucket contents
     /// </summary>
-    /// <param name="bucketName">Bucket name</param>
+    /// <param name="bucket">Bucket name</param>
     /// <param name="cancelToken">Cancel token</param>
     /// <param name="continuationToken"></param>
     /// <param name="maxKeys"></param>
     /// <param name="prefix"></param>
     /// <returns>Task of bucket contents</returns>
-    Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucketName,
+    Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucket,
         string? prefix = null,
         string? continuationToken = null,
         int maxKeys = 1000,
