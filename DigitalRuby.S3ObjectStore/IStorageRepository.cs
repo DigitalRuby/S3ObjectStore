@@ -75,7 +75,7 @@ public interface IStorageRepository
     /// <param name="bucket"></param>
     /// <param name="fileNames"></param>
     /// <param name="cancelToken"></param>
-    /// <returns></returns>
+    /// <returns>Task</returns>
     Task DeleteObjectsAsync(string bucket,
         IEnumerable<string> fileNames,
         CancellationToken cancelToken = default);
@@ -94,10 +94,10 @@ public interface IStorageRepository
     /// <summary>
     /// Attempts to delete a range of objects.  Note that AWS imposes a limit of 1000 keys per batch.
     /// </summary>
-    /// <param name="bucket"></param>
-    /// <param name="fileNames"></param>
-    /// <param name="cancelToken"></param>
-    /// <returns></returns>
+    /// <param name="bucket">Bucket</param>
+    /// <param name="fileNames">File names</param>
+    /// <param name="cancelToken">Cancel token</param>
+    /// <returns>Task of bool if deletion succeeded</returns>
     Task<bool> TryDeleteObjectsAsync(string bucket,
         IEnumerable<string> fileNames,
         CancellationToken cancelToken = default);
@@ -145,8 +145,8 @@ public interface IStorageRepository
     /// <param name="bucket">Bucket</param>
     /// <param name="fileName">File name</param>
     /// <param name="cancelToken">Cancel token</param>
-    /// <returns>Task of metadata response</returns>
-    Task<GetObjectMetadataResponse> GetObjectMetaDataAsync(string bucket,
+    /// <returns>Task of metadata response or null if no metadata found</returns>
+    Task<GetObjectMetadataResponse?> GetObjectMetaDataAsync(string bucket,
         string fileName,
         CancellationToken cancelToken = default);
 

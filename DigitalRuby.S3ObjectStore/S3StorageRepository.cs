@@ -19,8 +19,7 @@ public class S3StorageRepository : IStorageRepository
 		var s3Config = new AmazonS3Config
 		{
 			ServiceURL = config.Url,
-			Timeout = TimeSpan.FromSeconds(10.0),
-			UseAccelerateEndpoint = false
+			Timeout = TimeSpan.FromSeconds(10.0)
 		};
 		client = new AmazonS3Client(config.AccessKey, config.SecretKey, s3Config);
 		this.isProduction = environment.IsProduction();
@@ -55,6 +54,7 @@ public class S3StorageRepository : IStorageRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task DeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
 	{
 		DeleteObjectsRequest request = new()
@@ -92,6 +92,7 @@ public class S3StorageRepository : IStorageRepository
 		}
 	}
 
+	/// <inheritdoc />
 	public async Task<bool> TryDeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
 	{
 		try
@@ -107,7 +108,7 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Stream> ReadAsync(string bucket, string fileName, CancellationToken cancelToken = default)
+	public async Task<Stream?> ReadAsync(string bucket, string fileName, CancellationToken cancelToken = default)
 	{
 		GetObjectRequest request = new()
 		{
@@ -135,7 +136,7 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<Stream> TryReadAsync(string bucket, string fileName, CancellationToken cancelToken = default)
+	public async Task<Stream?> TryReadAsync(string bucket, string fileName, CancellationToken cancelToken = default)
 	{
 		try
 		{
@@ -148,7 +149,8 @@ public class S3StorageRepository : IStorageRepository
 		}
 	}
 
-	public async Task<GetObjectMetadataResponse> GetObjectMetaDataAsync(string bucket, string fileName, CancellationToken cancelToken = default)
+	/// <inheritdoc />
+	public async Task<GetObjectMetadataResponse?> GetObjectMetaDataAsync(string bucket, string fileName, CancellationToken cancelToken = default)
 	{
 		GetObjectMetadataRequest request = new()
 		{
@@ -157,14 +159,20 @@ public class S3StorageRepository : IStorageRepository
 		};
 
 		GetObjectMetadataResponse response = await client.GetObjectMetadataAsync(request, cancelToken);
-		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
+		if (response.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
+		{
+			// not fatal
+			return null;
+		}
+		else if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
 			throw new IOException("Failed to get object metadata, status code " + response.HttpStatusCode);
 		}
 		return response;
 	}
 
-	public async Task<GetObjectMetadataResponse> TryGetObjectMetaDataAsync(string bucket, string fileName, CancellationToken cancelToken = default)
+	/// <inheritdoc />
+	public async Task<GetObjectMetadataResponse?> TryGetObjectMetaDataAsync(string bucket, string fileName, CancellationToken cancelToken = default)
 	{
 		try
 		{
@@ -182,7 +190,7 @@ public class S3StorageRepository : IStorageRepository
 		string fileName,
 		string contentType,
 		Stream data,
-		Action<StreamTransferProgressArgs> progress,
+		Action<StreamTransferProgressArgs>? progress = null,
 		CancellationToken cancelToken = default)
 	{
 		PutObjectRequest request = new()
@@ -191,6 +199,7 @@ public class S3StorageRepository : IStorageRepository
 			Key = fileName,
 			ContentType = contentType,
 			InputStream = data,
+            CalculateContentMD5Header = disableSigning ? false : true,
 			DisableMD5Stream = disableSigning,
 			DisablePayloadSigning = disableSigning
 		};
@@ -263,7 +272,7 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucketName, string? prefix = null, string continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
+	public async Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucketName, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
 	{
 		ListObjectsV2Request request = new()
 		{
