@@ -53,12 +53,12 @@ public interface IStorageObject
     /// <summary>
     /// Object key
     /// </summary>
-    string Key { get; }
+    string? Key { get { return null; } }
 
     /// <summary>
     /// Owner identifier
     /// </summary>
-    string? Owner { get; }
+    string? Owner { get { return null; } }
 }
 
 /// <summary>

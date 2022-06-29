@@ -63,7 +63,15 @@ public sealed class Session : IStorageObject
 }
 ```
 
-You must implement the Key, and optionally, owner proeprties.
+Using `JsonPropertyName` to shorten property names is highly recommended as it will save you on storage space.
+
+The `IStorageObject` interface will return null for both `Key` and `Owner` by default.
+
+In most cases, you will usually implement both the `Key` and `Owner` properties yourself and return `Guid` or some other identifier.
+
+Exceptions to this case:
+- You can return null for the `Owner` if your service options (see down below) do not have a format specifier for the owner in the folder template - `{0}`.
+- You can return null for the `Key` if your service options specify that the folder format has the file name in it. By default, the `Key` is used as the file name, with a `.json` extension.
 
 #### Create your s3 repository
 
@@ -149,4 +157,4 @@ public interface IStorageObjectService<T> where T : class, IStorageObject
 
 Please email support@digitalruby.com if you have questions or feedback.
 
-- Jeff
+-- Jeff
