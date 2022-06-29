@@ -31,7 +31,7 @@ public sealed class Session : IStorageObject
     /// The session identifier, probably a guid
     /// </summary>
     [JsonPropertyName("k")]
-    public string Key { get; set; } = string.Empty;
+    public string? Key { get; set; } = string.Empty;
 
     /// <summary>
     /// The account id the session belongs to, probably a guid. Can be null if no owner.

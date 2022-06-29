@@ -109,7 +109,7 @@ public interface IStorageRepository
     /// <param name="fileName">File name</param>
     /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task of stream to read data from</returns>
-    Task<Stream> ReadAsync(string bucket,
+    Task<Stream?> ReadAsync(string bucket,
         string fileName,
         CancellationToken cancelToken = default);
 
@@ -119,13 +119,24 @@ public interface IStorageRepository
     /// <param name="bucket">Bucket name</param>
     /// <param name="fileName">File name</param>
     /// <param name="cancelToken">Cancel token</param>
-    /// <returns>Task of stream to read data from</returns>
-    async Task<string> ReadStringAsync(string bucket,
+    /// <returns>Task of string data (null if not found)</returns>
+    async Task<string?> ReadStringAsync(string bucket,
         string fileName,
         CancellationToken cancelToken = default)
     {
-        using Stream stream = await ReadAsync(bucket, fileName, cancelToken);
-        return await new StreamReader(stream, Encoding.UTF8).ReadToEndAsync();
+        var stream = await ReadAsync(bucket, fileName, cancelToken);
+        if (stream is null)
+        {
+            return null;
+        }
+        try
+        {
+            return await new StreamReader(stream, Encoding.UTF8).ReadToEndAsync();
+        }
+        finally
+        {
+            stream.Close();
+        }
     }
 
     /// <summary>

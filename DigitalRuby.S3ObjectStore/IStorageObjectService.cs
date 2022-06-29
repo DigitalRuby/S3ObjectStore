@@ -38,7 +38,7 @@ public sealed class StorageObjectServiceOptions<T> where T : class, IStorageObje
     /// <param name="key">Key</param>
     /// <param name="owner">Owner</param>
     /// <returns>File path</returns>
-    public string FormatFilePath(string key, string? owner)
+    public string FormatFilePath(string? key, string? owner)
     {
         return FormatFolderPath(owner) +
             (FolderFormatIncludesFileName ? string.Empty : key + ".json");
