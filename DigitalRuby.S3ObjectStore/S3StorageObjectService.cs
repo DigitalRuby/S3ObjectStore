@@ -11,7 +11,9 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     };
     
     private readonly StorageObjectServiceOptions<T> options;
-    private readonly IStorageRepository repository;
+
+    /// <inheritdoc />
+    public IStorageRepository Repository { get; }
     
     /// <summary>
     /// Constructor
@@ -21,7 +23,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     public S3StorageObjectService(StorageObjectServiceOptions<T> options, IStorageRepository repository)
     {
         this.options = options;
-        this.repository = repository;
+        Repository = repository;
         if (!options.FolderFormatIncludesFileName)
         {
             options.FolderFormat = options.FolderFormat.Trim('/') + "/";
@@ -32,7 +34,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     public async Task<T?> GetObjectAsync(string? key, string owner)
     {
         var path = options.FormatFilePath(key, owner);
-        using var result = await repository.ReadAsync(options.Bucket, path);
+        using var result = await Repository.ReadAsync(options.Bucket, path);
         if (result is not null)
         {
             var obj = System.Text.Json.JsonSerializer.Deserialize<T>(result);
@@ -49,14 +51,14 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
 
         // must await because of using statement on stream above
         var path = options.FormatFilePath(obj.Key, obj.Owner);
-        await repository.UpsertAsync(options.Bucket, path, "application/json", jsonStream);
+        await Repository.UpsertAsync(options.Bucket, path, "application/json", jsonStream);
     }
     
     /// <inheritdoc />
     public async Task<IReadOnlyCollection<T>> GetObjectsAsync(string owner)
     {
         var path = options.FormatFolderPath(owner);
-        var result = await repository.ListBucketContentsAsync(options.Bucket, path);
+        var result = await Repository.ListBucketContentsAsync(options.Bucket, path);
         var objects = new List<T>(result.Count);
         List<Task<T?>> tasks = new(result.Count);
         foreach (var item in result)
@@ -75,7 +77,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     public Task<IReadOnlyCollection<string>> GetKeys(string owner)
     {
         var path = options.FormatFolderPath(owner);
-        return repository.ListBucketContentsAsync(options.Bucket, path)
+        return Repository.ListBucketContentsAsync(options.Bucket, path)
             .ContinueWith(t =>
             {
                 var result = t.Result;
@@ -87,12 +89,12 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     public Task DeleteObjectAsync(string? key, string owner)
     {
         var path = options.FormatFilePath(key, owner);
-        return repository.DeleteAsync(options.Bucket, path);
+        return Repository.DeleteAsync(options.Bucket, path);
     }
 
     private async Task<T?> GetObjectRawAsync(string rawKey)
     {
-        var json = await repository.ReadAsync(options.Bucket, rawKey);
+        var json = await Repository.ReadAsync(options.Bucket, rawKey);
         if (json is null)
         {
             return null;

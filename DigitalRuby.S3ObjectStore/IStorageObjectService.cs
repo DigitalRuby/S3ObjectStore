@@ -103,4 +103,9 @@ public interface IStorageObjectService<T> where T : class, IStorageObject
     /// <param name="owner">Owner identifier</param>
     /// <returns>Task</returns>
     Task DeleteObjectAsync(string? key, string owner);
+
+    /// <summary>
+    /// Get the underlying repository in case you need lower level access
+    /// </summary>
+    IStorageRepository Repository { get; }
 }
