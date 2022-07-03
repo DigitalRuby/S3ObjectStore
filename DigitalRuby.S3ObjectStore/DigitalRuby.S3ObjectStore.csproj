@@ -5,7 +5,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.0.5</Version>
+		<Version>1.0.6</Version>
 		<Authors>jjxtra</Authors>
 		<Company>Digital Ruby, LLC</Company>
 		<Description>Flexible json s3 object storage for C#</Description>
@@ -16,9 +16,10 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/DigitalRuby/S3ObjectStore</RepositoryUrl>
 		<PackageTags>s3; objects; json; db; database; storage; fast; flexible; no-sql; no; sql; nosql; mongodb; cloud; azure; aws; amazon; google; gcp; file; flat; schema</PackageTags>
-		<PackageReleaseNotes>Expose repository on storage object service interface</PackageReleaseNotes>
+		<PackageReleaseNotes>Generate documentation file</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
 	</PropertyGroup>
 
 	<ItemGroup>
