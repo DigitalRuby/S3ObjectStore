@@ -31,10 +31,10 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public async Task<T?> GetObjectAsync(string? key, string owner)
+    public async Task<T?> GetObjectAsync(string? key, string owner, CancellationToken cancelToken = default)
     {
         var path = options.FormatFilePath(key, owner);
-        using var result = await Repository.ReadAsync(options.Bucket, path);
+        using var result = await Repository.ReadAsync(options.Bucket, path, cancelToken);
         if (result is not null)
         {
             var obj = System.Text.Json.JsonSerializer.Deserialize<T>(result);
@@ -44,21 +44,21 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public async Task SetObjectAsync(T obj)
+    public async Task SetObjectAsync(T obj, CancellationToken cancelToken = default)
     {
         var json = JsonSerializer.SerializeToUtf8Bytes(obj, jsonOptions);
         using var jsonStream = new System.IO.MemoryStream(json);
 
         // must await because of using statement on stream above
         var path = options.FormatFilePath(obj.Key, obj.Owner);
-        await Repository.UpsertAsync(options.Bucket, path, "application/json", jsonStream);
+        await Repository.UpsertAsync(options.Bucket, path, "application/json", jsonStream, cancelToken: cancelToken);
     }
     
     /// <inheritdoc />
-    public async Task<IReadOnlyCollection<T>> GetObjectsAsync(string owner)
+    public async Task<IReadOnlyCollection<T>> GetObjectsAsync(string owner, CancellationToken cancelToken = default)
     {
         var path = options.FormatFolderPath(owner);
-        var result = await Repository.ListBucketContentsAsync(options.Bucket, path);
+        var result = await Repository.ListBucketContentsAsync(options.Bucket, path, cancelToken: cancelToken);
         var objects = new List<T>(result.Count);
         List<Task<T?>> tasks = new(result.Count);
         foreach (var item in result)
@@ -74,10 +74,10 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyCollection<string>> GetKeys(string owner)
+    public Task<IReadOnlyCollection<string>> GetKeys(string owner, CancellationToken cancelToken = default)
     {
         var path = options.FormatFolderPath(owner);
-        return Repository.ListBucketContentsAsync(options.Bucket, path)
+        return Repository.ListBucketContentsAsync(options.Bucket, path, cancelToken: cancelToken)
             .ContinueWith(t =>
             {
                 var result = t.Result;
@@ -86,15 +86,15 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     }
 
     /// <inheritdoc />
-    public Task DeleteObjectAsync(string? key, string owner)
+    public Task DeleteObjectAsync(string? key, string owner, CancellationToken cancelToken = default)
     {
         var path = options.FormatFilePath(key, owner);
-        return Repository.DeleteAsync(options.Bucket, path);
+        return Repository.DeleteAsync(options.Bucket, path, cancelToken);
     }
 
-    private async Task<T?> GetObjectRawAsync(string rawKey)
+    private async Task<T?> GetObjectRawAsync(string rawKey, CancellationToken cancelToken = default)
     {
-        var json = await Repository.ReadAsync(options.Bucket, rawKey);
+        var json = await Repository.ReadAsync(options.Bucket, rawKey, cancelToken);
         if (json is null)
         {
             return null;

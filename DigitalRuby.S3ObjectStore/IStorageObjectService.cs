@@ -72,37 +72,42 @@ public interface IStorageObjectService<T> where T : class, IStorageObject
     /// </summary>
     /// <param name="key">Key</param>
     /// <param name="owner">Owner identifier</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Object or null if not found</returns>
-    Task<T?> GetObjectAsync(string? key, string owner);
+    Task<T?> GetObjectAsync(string? key, string owner, CancellationToken cancelToken = default);
 
     /// <summary>
     /// Set an object. The key and owner properties are used to determine the folder path
     /// </summary>
     /// <param name="obj">Object</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task</returns>
-    Task SetObjectAsync(T obj);
+    Task SetObjectAsync(T obj, CancellationToken cancelToken = default);
 
     /// <summary>
     /// Get all objects for the owner.
     /// </summary>
     /// <param name="owner">Owner identifier</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task of found objects</returns>
-    Task<IReadOnlyCollection<T>> GetObjectsAsync(string owner);
+    Task<IReadOnlyCollection<T>> GetObjectsAsync(string owner, CancellationToken cancelToken = default);
 
     /// <summary>
     /// Get just the keys for the owner, much more lightweight operation
     /// </summary>
     /// <param name="owner">Owner</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task of found keys</returns>
-    Task<IReadOnlyCollection<string>> GetKeys(string owner);
+    Task<IReadOnlyCollection<string>> GetKeys(string owner, CancellationToken cancelToken = default);
 
     /// <summary>
     /// Delete object.
     /// </summary>
     /// <param name="key">Key</param>
     /// <param name="owner">Owner identifier</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task</returns>
-    Task DeleteObjectAsync(string? key, string owner);
+    Task DeleteObjectAsync(string? key, string owner, CancellationToken cancelToken = default);
 
     /// <summary>
     /// Get the underlying repository in case you need lower level access
