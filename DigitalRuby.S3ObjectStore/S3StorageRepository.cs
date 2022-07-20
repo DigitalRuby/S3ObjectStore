@@ -19,7 +19,7 @@ public class S3StorageRepository : IStorageRepository
 		var s3Config = new AmazonS3Config
 		{
 			ServiceURL = config.Url,
-			Timeout = TimeSpan.FromSeconds(10.0)
+			Timeout = config.Timeout.Ticks == 0 ? TimeSpan.FromMinutes(2.0) : config.Timeout
 		};
 		client = new AmazonS3Client(config.AccessKey, config.SecretKey, s3Config);
 		this.isProduction = environment.IsProduction();
@@ -302,4 +302,5 @@ public class S3StorageRepository : IStorageRepository
 /// <param name="SecretKey">Secret key</param>
 /// <param name="Url">Region</param>
 /// <param name="DisableSigning">Whether to disable signing, needed for cloudflare r2 for example</param>
-public record S3Config(string AccessKey, string SecretKey, string Url, bool DisableSigning = false);
+/// <param name="Timeout">Timeout</param>
+public record S3Config(string AccessKey, string SecretKey, string Url, bool DisableSigning = false, TimeSpan Timeout = default);
