@@ -287,7 +287,7 @@ public class S3StorageRepository : IStorageRepository
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
 		}
-		return new ListBucketContentsResponse(response.S3Objects, response.ContinuationToken);
+		return new ListBucketContentsResponse(response.S3Objects, response.NextContinuationToken);
 	}
 }
 
