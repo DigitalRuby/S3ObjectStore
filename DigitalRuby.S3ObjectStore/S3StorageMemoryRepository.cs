@@ -132,7 +132,7 @@ public class S3StorageMemoryRepository : IStorageRepository
     }
 
     /// <inheritdoc />
-    public Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
+    public Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
     {
         List<S3Object> results = new();
         lock (buckets)
@@ -153,7 +153,7 @@ public class S3StorageMemoryRepository : IStorageRepository
                 }
             }
         }
-        return Task.FromResult<IReadOnlyCollection<S3Object>>(results);
+        return Task.FromResult(new ListBucketContentsResponse(results, null));
     }
 
     /// <inheritdoc />

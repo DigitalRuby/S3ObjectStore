@@ -228,9 +228,16 @@ public interface IStorageRepository
     /// <param name="maxKeys"></param>
     /// <param name="prefix"></param>
     /// <returns>Task of bucket contents</returns>
-    Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucket,
+    Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket,
         string? prefix = null,
         string? continuationToken = null,
         int maxKeys = 1000,
         CancellationToken cancelToken = default);
 }
+
+/// <summary>
+/// ListBucketResponse response
+/// </summary>
+/// <param name="Objects">Objects</param>
+/// <param name="ContinuationToken">Continuation token</param>
+public record ListBucketContentsResponse(IReadOnlyCollection<S3Object> Objects, string? ContinuationToken);

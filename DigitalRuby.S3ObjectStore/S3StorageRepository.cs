@@ -272,7 +272,7 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<IReadOnlyCollection<S3Object>> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
+	public async Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
 	{
 		ListObjectsV2Request request = new()
 		{
@@ -287,7 +287,7 @@ public class S3StorageRepository : IStorageRepository
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
 		}
-		return response.S3Objects;
+		return new ListBucketContentsResponse(response.S3Objects, response.ContinuationToken);
 	}
 }
 

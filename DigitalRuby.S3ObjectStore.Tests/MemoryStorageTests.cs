@@ -79,10 +79,10 @@ public sealed class MemoryStorageTests : Microsoft.Extensions.Internal.ISystemCl
         await repository.UpsertAsync(bucket, "other2", "application/json", item);
         
         var items = await repository.ListBucketContentsAsync(bucket, "file");
-        Assert.That(items, Has.Count.EqualTo(4));
+        Assert.That(items.Objects, Has.Count.EqualTo(4));
 
         items = await repository.ListBucketContentsAsync(bucket, "other");
-        Assert.That(items, Has.Count.EqualTo(2));
+        Assert.That(items.Objects, Has.Count.EqualTo(2));
     }
 
     private async Task<string?> ReadJsonAsync()

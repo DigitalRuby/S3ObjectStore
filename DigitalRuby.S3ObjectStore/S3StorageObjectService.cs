@@ -59,9 +59,9 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
     {
         var path = options.FormatFolderPath(owner);
         var result = await Repository.ListBucketContentsAsync(options.Bucket, path, cancelToken: cancelToken);
-        var objects = new List<T>(result.Count);
-        List<Task<T?>> tasks = new(result.Count);
-        foreach (var item in result)
+        var objects = new List<T>(result.Objects.Count);
+        List<Task<T?>> tasks = new(result.Objects.Count);
+        foreach (var item in result.Objects)
         {
             tasks.Add(Task.Run(() => GetObjectRawAsync(item.Key)));
         }
@@ -81,7 +81,7 @@ public sealed class S3StorageObjectService<T> : IStorageObjectService<T> where T
             .ContinueWith(t =>
             {
                 var result = t.Result;
-                return result.Select(i => i.Key).ToArray() as IReadOnlyCollection<string>;
+                return result.Objects.Select(i => i.Key).ToArray() as IReadOnlyCollection<string>;
             });
     }
 
