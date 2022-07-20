@@ -72,12 +72,24 @@ public interface IStorageRepository
     /// <summary>
     /// Deletes a range of objects from S3.  Note that AWS imposes a limit of 1000 keys per batch.
     /// </summary>
-    /// <param name="bucket"></param>
-    /// <param name="fileNames"></param>
-    /// <param name="cancelToken"></param>
+    /// <param name="bucket">Bucket</param>
+    /// <param name="files">Files</param>
+    /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task</returns>
     Task DeleteObjectsAsync(string bucket,
-        IEnumerable<string> fileNames,
+        IEnumerable<string> files,
+        CancellationToken cancelToken = default) =>
+            DeleteObjectsAsync(bucket, files.Select(f => new KeyVersion { Key = f }), cancelToken);
+
+    /// <summary>
+    /// Deletes a range of objects from S3.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// </summary>
+    /// <param name="bucket">Bucket</param>
+    /// <param name="files">Files</param>
+    /// <param name="cancelToken">Cancel token</param>
+    /// <returns>Task</returns>
+    Task DeleteObjectsAsync(string bucket,
+        IEnumerable<KeyVersion> files,
         CancellationToken cancelToken = default);
 
     /// <summary>
@@ -95,11 +107,23 @@ public interface IStorageRepository
     /// Attempts to delete a range of objects.  Note that AWS imposes a limit of 1000 keys per batch.
     /// </summary>
     /// <param name="bucket">Bucket</param>
-    /// <param name="fileNames">File names</param>
+    /// <param name="files">Files</param>
     /// <param name="cancelToken">Cancel token</param>
     /// <returns>Task of bool if deletion succeeded</returns>
     Task<bool> TryDeleteObjectsAsync(string bucket,
-        IEnumerable<string> fileNames,
+        IEnumerable<string> files,
+        CancellationToken cancelToken = default) =>
+            TryDeleteObjectsAsync(bucket, files.Select(f => new KeyVersion { Key = f }), cancelToken);
+    
+    /// <summary>
+    /// Attempts to delete a range of objects.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// </summary>
+    /// <param name="bucket">Bucket</param>
+    /// <param name="files">Files</param>
+    /// <param name="cancelToken">Cancel token</param>
+    /// <returns>Task of bool if deletion succeeded</returns>
+    Task<bool> TryDeleteObjectsAsync(string bucket,
+        IEnumerable<KeyVersion> files,
         CancellationToken cancelToken = default);
 
     /// <summary>

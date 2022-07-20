@@ -94,15 +94,15 @@ public class S3StorageMemoryRepository : IStorageRepository
     }
 
     /// <inheritdoc />
-    public Task DeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
+    public Task DeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
     {
         lock (buckets)
         {
             if (buckets.TryGetValue(bucket, out var bucketData))
             {
-                foreach (string fileName in fileNames)
+                foreach (var file in files)
                 {
-                    bucketData.Items.Remove(fileName);
+                    bucketData.Items.Remove(file.Key);
                 }
             }
         }
@@ -221,9 +221,9 @@ public class S3StorageMemoryRepository : IStorageRepository
     }
 
     /// <inheritdoc />
-    public async Task<bool> TryDeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
+    public async Task<bool> TryDeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
     {
-        await DeleteObjectsAsync(bucket, fileNames, cancelToken);
+        await DeleteObjectsAsync(bucket, files, cancelToken);
         return true;
     }
 

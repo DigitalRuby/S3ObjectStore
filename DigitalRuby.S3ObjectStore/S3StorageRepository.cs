@@ -55,25 +55,18 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task DeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
+	public async Task DeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
 	{
 		DeleteObjectsRequest request = new()
 		{
 			BucketName = bucket,
-			Objects = fileNames
-				.Select(
-					fn =>
-						new KeyVersion
-						{
-							Key = fn
-						})
-				.ToList()
+			Objects = files.ToList()
 		};
 
 		var response = await client.DeleteObjectsAsync(request, cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
-			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
+			throw new IOException("Failed to delete objects, status code " + response.HttpStatusCode);
 		}
 	}
 
@@ -93,16 +86,16 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<bool> TryDeleteObjectsAsync(string bucket, IEnumerable<string> fileNames, CancellationToken cancelToken = default)
+	public async Task<bool> TryDeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
 	{
 		try
 		{
-			await DeleteObjectsAsync(bucket, fileNames, cancelToken);
+			await DeleteObjectsAsync(bucket, files, cancelToken);
 			return true;
 		}
 		catch(Exception ex)
 		{
-			logger.LogError(ex, "Failed to delete bucket objects {bucket} {fileNames}", bucket, fileNames);
+			logger.LogError(ex, "Failed to delete bucket objects {bucket} {fileNames}", bucket, files);
 			return false;
 		}
 	}
