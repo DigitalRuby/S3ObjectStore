@@ -57,17 +57,27 @@ public class S3StorageRepository : IStorageRepository
 	/// <inheritdoc />
 	public async Task DeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
 	{
-		DeleteObjectsRequest request = new()
+		List<Task> tasks = new();
+		foreach (var chunk in files.Chunk(1000))
 		{
-			BucketName = bucket,
-			Objects = files.ToList()
-		};
+			var chunkCopy = chunk;
+			tasks.Add(Task.Run(async () =>
+			{
+				DeleteObjectsRequest request = new()
+				{
+					BucketName = bucket,
+					Objects = chunkCopy.ToList()
+				};
 
-		var response = await client.DeleteObjectsAsync(request, cancelToken);
-		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
-		{
-			throw new IOException("Failed to delete objects, status code " + response.HttpStatusCode);
+				var response = await client.DeleteObjectsAsync(request, cancelToken);
+				if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
+				{
+					throw new IOException("Failed to delete objects, status code " + response.HttpStatusCode);
+				}
+			}, cancelToken));
+			await Task.Delay(20, cancelToken); // prevent rate limit
 		}
+		await Task.WhenAll(tasks);
 	}
 
 	/// <inheritdoc />
@@ -265,14 +275,15 @@ public class S3StorageRepository : IStorageRepository
 	}
 
 	/// <inheritdoc />
-	public async Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket, string? prefix = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
+	public async Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket, string? prefix = null, string? startAfter = null, string? continuationToken = null, int maxKeys = 1000, CancellationToken cancelToken = default)
 	{
 		ListObjectsV2Request request = new()
 		{
 			BucketName = bucket,
 			Prefix = prefix,
 			ContinuationToken = continuationToken,
-			MaxKeys = maxKeys
+			MaxKeys = maxKeys,
+			StartAfter = startAfter
 		};
 
 		ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancelToken);

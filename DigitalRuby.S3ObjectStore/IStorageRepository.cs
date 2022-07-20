@@ -70,7 +70,7 @@ public interface IStorageRepository
         CancellationToken cancelToken = default);
 
     /// <summary>
-    /// Deletes a range of objects from S3.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// Deletes a range of objects from S3. This method will chunk a file list greater than 1000 into 1000 item chunks.
     /// </summary>
     /// <param name="bucket">Bucket</param>
     /// <param name="files">Files</param>
@@ -82,7 +82,7 @@ public interface IStorageRepository
             DeleteObjectsAsync(bucket, files.Select(f => new KeyVersion { Key = f }), cancelToken);
 
     /// <summary>
-    /// Deletes a range of objects from S3.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// Deletes a range of objects from S3. This method will chunk a file list greater than 1000 into 1000 item chunks.
     /// </summary>
     /// <param name="bucket">Bucket</param>
     /// <param name="files">Files</param>
@@ -104,7 +104,7 @@ public interface IStorageRepository
         CancellationToken cancelToken = default);
 
     /// <summary>
-    /// Attempts to delete a range of objects.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// Attempts to delete a range of objects. This method will chunk a file list greater than 1000 into 1000 item chunks.
     /// </summary>
     /// <param name="bucket">Bucket</param>
     /// <param name="files">Files</param>
@@ -114,9 +114,9 @@ public interface IStorageRepository
         IEnumerable<string> files,
         CancellationToken cancelToken = default) =>
             TryDeleteObjectsAsync(bucket, files.Select(f => new KeyVersion { Key = f }), cancelToken);
-    
+
     /// <summary>
-    /// Attempts to delete a range of objects.  Note that AWS imposes a limit of 1000 keys per batch.
+    /// Attempts to delete a range of objects. This method will chunk a file list greater than 1000 into 1000 item chunks.
     /// </summary>
     /// <param name="bucket">Bucket</param>
     /// <param name="files">Files</param>
@@ -247,13 +247,15 @@ public interface IStorageRepository
     /// List bucket contents
     /// </summary>
     /// <param name="bucket">Bucket name</param>
+    /// <param name="prefix">Filter prefix</param>
+    /// <param name="startAfter">Key to start after or null from first key in bucket</param>
+    /// <param name="continuationToken">Continuation token</param>
+    /// <param name="maxKeys">Max keys (1000 is max for most providers, use continuation token to iterate more)</param>
     /// <param name="cancelToken">Cancel token</param>
-    /// <param name="continuationToken"></param>
-    /// <param name="maxKeys"></param>
-    /// <param name="prefix"></param>
     /// <returns>Task of bucket contents</returns>
     Task<ListBucketContentsResponse> ListBucketContentsAsync(string bucket,
         string? prefix = null,
+        string? startAfter = null,
         string? continuationToken = null,
         int maxKeys = 1000,
         CancellationToken cancelToken = default);
