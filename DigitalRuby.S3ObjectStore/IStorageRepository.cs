@@ -259,6 +259,14 @@ public interface IStorageRepository
         string? continuationToken = null,
         int maxKeys = 1000,
         CancellationToken cancelToken = default);
+
+    /// <summary>
+    /// Whther the storage repository is enabled. A disabled repository is not configured properly or has been disabled.
+    /// </summary>
+    bool Enabled
+    {
+        get => true;
+    }
 }
 
 /// <summary>

@@ -1,30 +1,47 @@
+using System;
+
 namespace DigitalRuby.S3ObjectStore;
 
 /// <inheritdoc />
 public class S3StorageRepository : IStorageRepository
 {
-	private readonly AmazonS3Client client;
 	private readonly bool isProduction;
 	private readonly ILogger logger;
-	private readonly bool disableSigning;
-        
+	private readonly Func<S3Config> configFactory;
+
+	/// <inheritdoc />
+	public bool Enabled
+	{
+		get
+		{
+			var currentConfig = configFactory();
+			return !string.IsNullOrWhiteSpace(currentConfig.AccessKey) &&
+				!string.IsNullOrWhiteSpace(currentConfig.SecretKey);
+		}
+	}
+
 	/// <summary>
 	/// Constructor
 	/// </summary>
 	/// <param name="config">Config</param>
 	/// <param name="environment">Environment</param>
 	/// <param name="logger">Logger</param>
-	public S3StorageRepository(S3Config config, IHostEnvironment environment, ILogger<S3StorageRepository> logger)
+	public S3StorageRepository(S3Config config, IHostEnvironment environment, ILogger<S3StorageRepository> logger) :
+		this(() => config, environment, logger)
 	{
-		var s3Config = new AmazonS3Config
-		{
-			ServiceURL = config.Url,
-			Timeout = config.Timeout.Ticks == 0 ? TimeSpan.FromMinutes(2.0) : config.Timeout
-		};
-		client = new AmazonS3Client(config.AccessKey, config.SecretKey, s3Config);
-		this.isProduction = environment.IsProduction();
-		this.logger = logger;
-		this.disableSigning = config.DisableSigning;
+	}
+
+    /// <summary>
+    /// Constructor
+    /// </summary>
+    /// <param name="configFactory">Config factory</param>
+    /// <param name="environment">Environment</param>
+    /// <param name="logger">Logger</param>
+    public S3StorageRepository(Func<S3Config> configFactory, IHostEnvironment environment, ILogger<S3StorageRepository> logger)
+	{
+		this.configFactory = configFactory;
+        this.isProduction = environment.IsProduction();
+        this.logger = logger;
 	}
 
 	/// <inheritdoc />
@@ -37,6 +54,7 @@ public class S3StorageRepository : IStorageRepository
 		};
 		try
 		{
+			var (client, _) = CreateClient();
 			var response = await client.DeleteObjectAsync(request, cancelToken);
 			if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 			{
@@ -57,7 +75,8 @@ public class S3StorageRepository : IStorageRepository
 	/// <inheritdoc />
 	public async Task DeleteObjectsAsync(string bucket, IEnumerable<KeyVersion> files, CancellationToken cancelToken = default)
 	{
-		List<Task> tasks = new();
+        var (client, _) = CreateClient();
+        List<Task> tasks = new();
 		foreach (var chunk in files.Chunk(1000))
 		{
 			var chunkCopy = chunk;
@@ -120,7 +139,8 @@ public class S3StorageRepository : IStorageRepository
 		};
 		try
 		{
-			GetObjectResponse response = await client.GetObjectAsync(request, cancelToken);
+            var (client, _) = CreateClient();
+            GetObjectResponse response = await client.GetObjectAsync(request, cancelToken);
 			if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 			{
 				throw new IOException("Failed to read bucket, status code " + response.HttpStatusCode);
@@ -161,7 +181,8 @@ public class S3StorageRepository : IStorageRepository
 			Key = fileName
 		};
 
-		GetObjectMetadataResponse response = await client.GetObjectMetadataAsync(request, cancelToken);
+        var (client, _) = CreateClient();
+        GetObjectMetadataResponse response = await client.GetObjectMetadataAsync(request, cancelToken);
 		if (response.HttpStatusCode == System.Net.HttpStatusCode.NotFound)
 		{
 			// not fatal
@@ -196,7 +217,8 @@ public class S3StorageRepository : IStorageRepository
 		Action<StreamTransferProgressArgs>? progress = null,
 		CancellationToken cancelToken = default)
 	{
-		PutObjectRequest request = new()
+        var (client, disableSigning) = CreateClient();
+        PutObjectRequest request = new()
 		{
 			BucketName = bucket,
 			Key = fileName,
@@ -232,7 +254,8 @@ public class S3StorageRepository : IStorageRepository
 		{
 			BucketName = bucket
 		};
-		var response = await client.PutBucketAsync(request, cancelToken);
+        var (client, _) = CreateClient();
+        var response = await client.PutBucketAsync(request, cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
@@ -251,7 +274,8 @@ public class S3StorageRepository : IStorageRepository
 		{
 			BucketName = bucket
 		};
-		var response = await client.DeleteBucketAsync(request, cancelToken);
+        var (client, _) = CreateClient();
+        var response = await client.DeleteBucketAsync(request, cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
@@ -266,7 +290,8 @@ public class S3StorageRepository : IStorageRepository
 			throw new NotSupportedException("Buckets cannot be listed programatically in production");
 		}
 
-		ListBucketsResponse response = await client.ListBucketsAsync(cancelToken);
+        var (client, _) = CreateClient();
+        ListBucketsResponse response = await client.ListBucketsAsync(cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
@@ -286,13 +311,26 @@ public class S3StorageRepository : IStorageRepository
 			StartAfter = startAfter
 		};
 
-		ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancelToken);
+        var (client, _) = CreateClient();
+        ListObjectsV2Response response = await client.ListObjectsV2Async(request, cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
 			throw new IOException("Failed to delete bucket, status code " + response.HttpStatusCode);
 		}
 		return new ListBucketContentsResponse(response.S3Objects, response.NextContinuationToken);
 	}
+
+	private (AmazonS3Client client, bool disableSigning) CreateClient()
+	{
+		var currentConfig = configFactory();
+        var s3Config = new AmazonS3Config
+        {
+            ServiceURL = currentConfig.Url,
+            Timeout = currentConfig.Timeout.Ticks == 0 ? TimeSpan.FromMinutes(2.0) : currentConfig.Timeout
+        };
+        var client = new AmazonS3Client(currentConfig.AccessKey, currentConfig.SecretKey, s3Config);
+        return (client, currentConfig.DisableSigning);
+    }
 }
 
 /// <summary>
