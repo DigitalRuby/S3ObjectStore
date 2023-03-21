@@ -238,7 +238,7 @@ public class S3StorageRepository : IStorageRepository
 		var response = await client.PutObjectAsync(request, cancelToken);
 		if (response.HttpStatusCode >= System.Net.HttpStatusCode.BadRequest)
 		{
-			throw new IOException("Error upserting bucket, status code " + response.HttpStatusCode);
+			throw new IOException("Error upserting file " + fileName + " to bucket " + bucket + ", status code " + response.HttpStatusCode);
 		}
 	}
 
