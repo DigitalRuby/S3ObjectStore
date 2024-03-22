@@ -2,10 +2,10 @@
 
 	<PropertyGroup>
 		<OutputType>Library</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<Version>1.0.13</Version>
+		<Version>2.0.0</Version>
 		<Authors>jjxtra</Authors>
 		<Company>Digital Ruby, LLC</Company>
 		<Description>Flexible json s3 object storage for C#</Description>
@@ -16,7 +16,7 @@
 		<PackageReadmeFile>README.md</PackageReadmeFile>
 		<RepositoryUrl>https://github.com/DigitalRuby/S3ObjectStore</RepositoryUrl>
 		<PackageTags>s3; objects; json; db; database; storage; fast; flexible; no-sql; no; sql; nosql; mongodb; cloud; azure; aws; amazon; google; gcp; file; flat; schema; wasabi; b2; backblaze; cloudflare; r2</PackageTags>
-		<PackageReleaseNotes>Allow factory function for config</PackageReleaseNotes>
+		<PackageReleaseNotes>.NET 8</PackageReleaseNotes>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<GenerateDocumentationFile>True</GenerateDocumentationFile>
@@ -34,10 +34,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="AWSSDK.S3" Version="3.7.9.19" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="6.0.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.1" />
+		<PackageReference Include="AWSSDK.S3" Version="3.7.307.1" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Hosting.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.1" />
 	</ItemGroup>
 
 </Project>
