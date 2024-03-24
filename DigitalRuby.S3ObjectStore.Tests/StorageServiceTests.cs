@@ -23,7 +23,7 @@
         [SetUp]
         public void Setup()
         {
-            repository = new(this);
+            repository = new(new FakeTimeProvider());
             repository.CreateBucketAsync(bucket).ConfigureAwait(false).GetAwaiter().GetResult();
         }
 

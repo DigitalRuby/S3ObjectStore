@@ -46,13 +46,13 @@ public class S3StorageMemoryRepository : IStorageRepository
     }
 
 	private readonly Dictionary<string, S3MemoryBucket> buckets = new();
-    private readonly ISystemClock clock;
+    private readonly TimeProvider clock;
     
     /// <summary>
     /// Constructor
     /// </summary>
     /// <param name="clock">Clock</param>
-    public S3StorageMemoryRepository(ISystemClock clock)
+    public S3StorageMemoryRepository(TimeProvider clock)
     {
         this.clock = clock;
     }
@@ -64,7 +64,7 @@ public class S3StorageMemoryRepository : IStorageRepository
         {
             if (!buckets.ContainsKey(bucket))
             {
-                buckets[bucket] = new() { DateCreated = clock.UtcNow.DateTime };
+                buckets[bucket] = new() { DateCreated = clock.GetUtcNow().DateTime };
             }
         }
         return Task.CompletedTask;
@@ -204,9 +204,9 @@ public class S3StorageMemoryRepository : IStorageRepository
                 bucketData.Items[fileName] = new S3MemoryObject
                 {
                     Data = ms.ToArray(),
-                    LastModified = clock.UtcNow.DateTime,
+                    LastModified = clock.GetUtcNow().DateTime,
                     ContentType = contentType,
-                    Expires = clock.UtcNow.DateTime.AddDays(1)
+                    Expires = clock.GetUtcNow().DateTime.AddDays(1)
                 };
             }
         }

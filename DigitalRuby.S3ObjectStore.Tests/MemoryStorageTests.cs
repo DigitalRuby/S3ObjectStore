@@ -4,7 +4,7 @@ namespace DigitalRuby.S3ObjectStore.Tests;
 /// Memory storage tests
 /// </summary>
 [TestFixture]
-public sealed class MemoryStorageTests : Microsoft.Extensions.Internal.ISystemClock
+public sealed class MemoryStorageTests
 {
     private const string bucket = "test";
     private const string json = "{\"key\":\"value\",\"key2\":42}";
@@ -22,7 +22,7 @@ public sealed class MemoryStorageTests : Microsoft.Extensions.Internal.ISystemCl
     [SetUp]
     public void Setup()
     {
-        repository = new(this);
+        repository = new(new FakeTimeProvider());
         repository.CreateBucketAsync(bucket, default).GetAwaiter().GetResult();
     }
 
